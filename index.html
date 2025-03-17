@@ -464,38 +464,40 @@
             document.getElementById("signatureBtn").disabled = true;
         }
 
-        // QR Scanner Functions
-        function openQRScanner(action, expectedCode) {
-            // Open the QR scanner for the specified action
-            currentAction = action;
-            document.getElementById("qrOverlay").style.display = "block";
-            document.getElementById("qrPopup").style.display = "block";
-            document.getElementById("qrMismatch").style.display = "none";
+function openQRScanner(action, expectedCode) {
+    // Open the QR scanner for the specified action
+    currentAction = action;
+    document.getElementById("qrOverlay").style.display = "block";
+    document.getElementById("qrPopup").style.display = "block";
+    document.getElementById("qrMismatch").style.display = "none";
 
-            scanner = new Html5Qrcode("qr-reader");
-            scanner.start(
-                { facingMode: "environment" }, // Use the rear camera
-                { fps: 10, qrbox: 250 }, // Scanner configuration
-                qrCodeMessage => {
-                    // Callback when a QR code is scanned
-                    if (qrCodeMessage === expectedCode) {
-                        let button = document.getElementById(action + "Btn");
-                        button.classList.add("completed"); // Mark the button as completed
-                        button.textContent = button.textContent + " - Completed"; // Update button text
-                        button.disabled = true; // Disable the button
-                        checkAllCompleted(); // Check if all activities are completed
-                        closeQRScanner(); // Close the scanner
-                        if (action === "funQuiz") startFunQuiz(); // Start the quiz if applicable
+    scanner = new Html5Qrcode("qr-reader");
+    scanner.start(
+        { facingMode: "environment" }, // Use the rear camera
+        { fps: 10, qrbox: 250 }, // Scanner configuration
+        qrCodeMessage => {
+            // Callback when a QR code is scanned
+            if (qrCodeMessage === expectedCode) {
+                let button = document.getElementById(action + "Btn");
+                button.classList.add("completed"); // Mark the button as completed
+                button.textContent = button.textContent + " - Completed"; // Update button text
+                button.disabled = true; // Disable the button
 
-                        // Save completed buttons to local storage
-                        saveCompletedButtons();
-                    } else {
-                        document.getElementById("qrMismatch").style.display = "block"; // Show mismatch message
-                    }
-                },
-                errorMessage => console.log(errorMessage) // Log errors
-            );
-        }
+                // Save completed buttons to local storage
+                saveCompletedButtons();
+
+                // Check if all buttons are completed
+                checkAllCompleted();
+
+                closeQRScanner(); // Close the scanner
+                if (action === "funQuiz") startFunQuiz(); // Start the quiz if applicable
+            } else {
+                document.getElementById("qrMismatch").style.display = "block"; // Show mismatch message
+            }
+        },
+        errorMessage => console.log(errorMessage) // Log errors
+    );
+}
 
         function closeQRScanner() {
             // Close the QR scanner
@@ -519,20 +521,23 @@
         //}
       
         // Quiz Functions
-        function startFunQuiz() {
-        // Start the fun quiz
-        const funQuizButton = document.getElementById("funQuizBtn");
-        funQuizButton.classList.add("completed"); // Add completed class
-        funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
-        funQuizButton.disabled = true; // Disable the button
+function startFunQuiz() {
+    // Start the fun quiz
+    const funQuizButton = document.getElementById("funQuizBtn");
+    funQuizButton.classList.add("completed"); // Add completed class
+    funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
+    funQuizButton.disabled = true; // Disable the button
 
-        // Save the completed state to local storage
-        saveCompletedButtons();
+    // Save completed buttons to local storage
+    saveCompletedButtons();
 
-        // Start the quiz
-        currentQuizIndex = 0;
-        showNextQuiz();
-        }
+    // Check if all buttons are completed
+    checkAllCompleted();
+
+    // Start the quiz
+    currentQuizIndex = 0;
+    showNextQuiz();
+}
 
         function showNextQuiz() {
             // Display the next quiz question
@@ -598,19 +603,21 @@
         //}
 
         // Check if all activities are completed in random
-        function checkAllCompleted() {
-        const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn"];
-        const allCompleted = buttons.every(id => {
+// Completion Check
+function checkAllCompleted() {
+    // Check if all activities are completed
+    const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn"];
+    const allCompleted = buttons.every(id => {
         const button = document.getElementById(id);
         return button.classList.contains("completed"); // Check if each button is completed
-        });
+    });
 
-        if (allCompleted) {
+    if (allCompleted) {
         const signatureBtn = document.getElementById("signatureBtn");
         signatureBtn.classList.remove("disabled"); // Enable signature button
         signatureBtn.disabled = false;
-            }
-        }
+    }
+}
         
 
         // Camera Functions
@@ -755,31 +762,32 @@
       localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
       }
 
-        function restoreCompletedButtons() {
-            // Restore completed buttons from local storage
-            const storageData = JSON.parse(localStorage.getItem("completedButtons"));
-            
-            if (storageData && storageData.completedButtons) {
-                const currentTime = new Date().getTime();
-                const storedTime = storageData.timestamp;
-                const expirationTime = 1 * 60 * 1000; // 30 minutes in milliseconds
+function restoreCompletedButtons() {
+    // Restore completed buttons from local storage
+    const storageData = JSON.parse(localStorage.getItem("completedButtons"));
+    
+    if (storageData && storageData.completedButtons) {
+        const currentTime = new Date().getTime();
+        const storedTime = storageData.timestamp;
+        const expirationTime = 1 * 60 * 1000; // 30 minutes in milliseconds
 
-                if (currentTime - storedTime < expirationTime) {
-                    storageData.completedButtons.forEach(id => {
-                        const button = document.getElementById(id);
-                        if (button) {
-                            button.classList.add("completed"); // Mark button as completed
-                            button.textContent = button.textContent + " - Completed"; // Update button text
-                            button.disabled = true; // Disable the button
-                        }
-                    });
-
-                    checkAllCompleted(); // Check if all activities are completed
-                } else {
-                    localStorage.removeItem("completedButtons"); // Clear expired data
+        if (currentTime - storedTime < expirationTime) {
+            storageData.completedButtons.forEach(id => {
+                const button = document.getElementById(id);
+                if (button) {
+                    button.classList.add("completed"); // Mark button as completed
+                    button.textContent = button.textContent + " - Completed"; // Update button text
+                    button.disabled = true; // Disable the button
                 }
-            }
+            });
+
+            // Check if all buttons are completed
+            checkAllCompleted();
+        } else {
+            localStorage.removeItem("completedButtons"); // Clear expired data
         }
+    }
+}
 
         // Restore completed buttons on page load
         window.onload = function() {
@@ -787,4 +795,4 @@
         };
     </script>
 </body>
-</html
+</html>
