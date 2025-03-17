@@ -620,106 +620,108 @@ function checkAllCompleted() {
 }
         
 
-        // Camera Functions
-        let cameraStream = null;
+// Camera Functions
+let cameraStream = null;
 
-        function showThankYou() {
-            // Show the camera popup
-            document.getElementById("cameraOverlay").style.display = "block";
-            document.getElementById("cameraPopup").style.display = "block";
+function showThankYou() {
+    // Show the camera popup
+    document.getElementById("cameraOverlay").style.display = "block";
+    document.getElementById("cameraPopup").style.display = "block";
 
-            // Start the camera
-            startCamera();
+    // Start the default camera
+    startCamera();
 
-            // Add event listener to the capture button
-            document.getElementById('captureButton').addEventListener('click', capturePhoto);
+    // Add event listener to the capture button
+    document.getElementById('captureButton').addEventListener('click', capturePhoto);
 
-            // Add event listener to the close button
-            document.getElementById('closeCameraButton').addEventListener('click', closeCameraPopup);
-        }
+    // Add event listener to the close button
+    document.getElementById('closeCameraButton').addEventListener('click', closeCameraPopup);
+}
 
-        function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    cameraStream = stream;
-                    const video = document.getElementById('cameraVideo');
-                    video.srcObject = stream;
-                })
-                .catch(err => {
-                    console.error("Error accessing the camera: ", err);
-                    alert("Unable to access the camera. Please ensure you have granted permission.");
-                });
-        }
-
-        function capturePhoto() {
+function startCamera() {
+    // Access the default camera (no specific constraints)
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            cameraStream = stream;
             const video = document.getElementById('cameraVideo');
-            const canvas = document.getElementById('cameraCanvas');
-            const photo = document.getElementById('cameraPhoto');
-            const saveInstruction = document.getElementById('saveInstruction');
-            const closeButton = document.getElementById('closeCameraButton');
+            video.srcObject = stream;
+            video.play(); // Start playing the video stream
+        })
+        .catch(err => {
+            console.error("Error accessing the camera: ", err);
+            alert("Unable to access the camera. Please ensure you have granted permission.");
+        });
+}
 
-            // Set canvas dimensions to match video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+function capturePhoto() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('cameraCanvas');
+    const photo = document.getElementById('cameraPhoto');
+    const saveInstruction = document.getElementById('saveInstruction');
+    const closeButton = document.getElementById('closeCameraButton');
 
-            // Draw the current video frame on the canvas
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-            // Convert canvas image to data URL and display it
-            const dataUrl = canvas.toDataURL('image/png');
-            photo.src = dataUrl;
-            photo.style.display = 'block';
-            video.style.display = 'none';
+    // Draw the current video frame on the canvas
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Show save instruction and close button
-            saveInstruction.style.display = 'block';
-            closeButton.style.display = 'block';
+    // Convert canvas image to data URL and display it
+    const dataUrl = canvas.toDataURL('image/png');
+    photo.src = dataUrl;
+    photo.style.display = 'block';
+    video.style.display = 'none';
 
-            // Stop the camera stream
-            cameraStream.getTracks().forEach(track => track.stop());
+    // Show save instruction and close button
+    saveInstruction.style.display = 'block';
+    closeButton.style.display = 'block';
 
-            // Add long-press event to save the photo
-            photo.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                savePhotoToGallery(dataUrl);
-            });
-        }
+    // Stop the camera stream
+    cameraStream.getTracks().forEach(track => track.stop());
 
-        function savePhotoToGallery(dataUrl) {
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = 'captured_photo.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            alert('Photo saved to your gallery!');
-        }
+    // Add long-press event to save the photo
+    photo.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        savePhotoToGallery(dataUrl);
+    });
+}
 
-        function closeCameraPopup() {
-            // Close the camera popup
-            document.getElementById("cameraOverlay").style.display = "none";
-            document.getElementById("cameraPopup").style.display = "none";
+function savePhotoToGallery(dataUrl) {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = 'captured_photo.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    alert('Photo saved to your gallery!');
+}
 
-            // Stop the camera stream if it's still running
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-            }
+function closeCameraPopup() {
+    // Close the camera popup
+    document.getElementById("cameraOverlay").style.display = "none";
+    document.getElementById("cameraPopup").style.display = "none";
 
-            // Mark the ePOD button as completed
-            const signatureBtn = document.getElementById("signatureBtn");
-            signatureBtn.classList.remove("disabled");
-            signatureBtn.classList.add("completed");
-            signatureBtn.textContent = "ePOD - Completed";
-            signatureBtn.disabled = true;
+    // Stop the camera stream if it's still running
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+    }
 
-            // Show the thank you popup
-            document.getElementById("thankYouOverlay").style.display = "block";
-            document.getElementById("thankYouPopup").style.display = "block";
+    // Mark the ePOD button as completed
+    const signatureBtn = document.getElementById("signatureBtn");
+    signatureBtn.classList.remove("disabled");
+    signatureBtn.classList.add("completed");
+    signatureBtn.textContent = "ePOD - Completed";
+    signatureBtn.disabled = true;
 
-            // Save completed buttons to local storage
-            saveCompletedButtons();
-        }
+    // Show the thank you popup
+    document.getElementById("thankYouOverlay").style.display = "block";
+    document.getElementById("thankYouPopup").style.display = "block";
+
+    // Save completed buttons to local storage
+    saveCompletedButtons();
+}
 
         // Local Storage Logic
         /* function saveCompletedButtons() {
