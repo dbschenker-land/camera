@@ -652,7 +652,7 @@ function startCamera() {
         });
 }
 
-function capturePhoto() {
+/*function capturePhoto() {
     const video = document.getElementById('cameraVideo');
     const canvas = document.getElementById('cameraCanvas');
     const photo = document.getElementById('cameraPhoto');
@@ -685,7 +685,87 @@ function capturePhoto() {
         e.preventDefault();
         savePhotoToGallery(dataUrl);
     });
+}*/
+      
+    function capturePhoto() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.createElement('canvas');
+    const photo = document.getElementById('cameraPhoto');
+    const saveInstruction = document.getElementById('saveInstruction');
+    const closeButton = document.getElementById('closeCameraButton');
+
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw the current video frame on the canvas
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert canvas image to data URL and display it
+    const dataUrl = canvas.toDataURL('image/png');
+    photo.src = dataUrl;
+    photo.style.display = 'block';
+    video.style.display = 'none';
+
+    // Show save instruction and close button
+    saveInstruction.style.display = 'block';
+    closeButton.style.display = 'block';
+
+    // Stop the camera stream
+    cameraStream.getTracks().forEach(track => track.stop());
+
+    // Add long-press event to save the photo
+    photo.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        savePhotoToGallery(dataUrl);
+    });
+
+    // Show the photo in a pop-up
+    showPhotoPopup(dataUrl);
 }
+
+function showPhotoPopup(dataUrl) {
+    // Create a new pop-up for the photo
+    const photoPopup = document.createElement('div');
+    photoPopup.className = 'popup';
+    photoPopup.innerHTML = `
+        <h3>Your Photo</h3>
+        <img src="${dataUrl}" alt="Captured Photo" style="width: 100%; border-radius: 8px;">
+        <button onclick="closePhotoPopup()">Continue</button>
+    `;
+    document.body.appendChild(photoPopup);
+
+    // Show the overlay
+    document.getElementById('cameraOverlay').style.display = 'block';
+    photoPopup.style.display = 'block';
+}
+
+function closePhotoPopup() {
+    // Remove the photo pop-up
+    const photoPopup = document.querySelector('.popup');
+    if (photoPopup) {
+        photoPopup.remove();
+    }
+
+    // Close the camera overlay
+    document.getElementById('cameraOverlay').style.display = 'none';
+
+    // Direct to the thank you pop-up
+    document.getElementById('thankYouOverlay').style.display = 'block';
+    document.getElementById('thankYouPopup').style.display = 'block';
+
+    // Mark the ePOD button as completed
+    const signatureBtn = document.getElementById('signatureBtn');
+    signatureBtn.classList.remove('disabled');
+    signatureBtn.classList.add('completed');
+    signatureBtn.textContent = 'ePOD - Completed';
+    signatureBtn.disabled = true;
+
+    // Save completed buttons to local storage
+    saveCompletedButtons();
+}  
+    
 
 function savePhotoToGallery(dataUrl) {
     const link = document.createElement('a');
