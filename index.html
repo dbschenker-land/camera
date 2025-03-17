@@ -253,6 +253,38 @@
         #closeCameraButton:hover {
             background-color: #666; /* Darker grey on hover */
         }
+      /* Photo Popup Styling */
+#photoPopup {
+    background-color: teal;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+#photoPopup img {
+    width: 100%;
+    max-width: 300px;
+    margin: 15px auto;
+    border-radius: 8px;
+}
+
+#photoPopup button {
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+#photoPopup button:hover {
+    background-color: #555;
+
+
+}
     </style>
 </head>
 <body>
@@ -338,7 +370,15 @@
             <button id="quizCloseButton" onclick="closeQuiz()" style="display: none;">Finish Quiz</button>
         </div>
     </div>
+<!-- Photo Popup -->
+<div class="overlay" id="photoOverlay"></div>
+<div class="popup" id="photoPopup">
+    <h3>Your Photo</h3>
+    <img id="displayedPhoto" src="#" alt="Captured Photo" style="width: 100%; border-radius: 8px;">
+    <button onclick="closePhotoPopup()">Continue</button>
+</div>  
 
+  
     <script>
         // Welcome Popup Functions
         function closeWelcomePopup() {
@@ -687,7 +727,7 @@ function startCamera() {
     });
 }*/
       
-    function capturePhoto() {
+function capturePhoto() {
     const video = document.getElementById('cameraVideo');
     const canvas = document.createElement('canvas');
     const photo = document.getElementById('cameraPhoto');
@@ -721,7 +761,7 @@ function startCamera() {
         savePhotoToGallery(dataUrl);
     });
 
-    // Show the photo in a pop-up
+    // Show the photo in the photo popup
     showPhotoPopup(dataUrl);
 }
 
@@ -777,6 +817,36 @@ function savePhotoToGallery(dataUrl) {
     alert('Photo saved to your gallery!');
 }
 
+      function showPhotoPopup(dataUrl) {
+    // Set the captured photo in the displayedPhoto element
+    const displayedPhoto = document.getElementById('displayedPhoto');
+    displayedPhoto.src = dataUrl;
+
+    // Show the photo popup and overlay
+    document.getElementById('photoOverlay').style.display = 'block';
+    document.getElementById('photoPopup').style.display = 'block';
+}
+      
+function closePhotoPopup() {
+    // Hide the photo popup and overlay
+    document.getElementById('photoOverlay').style.display = 'none';
+    document.getElementById('photoPopup').style.display = 'none';
+
+    // Direct to the thank you popup
+    document.getElementById('thankYouOverlay').style.display = 'block';
+    document.getElementById('thankYouPopup').style.display = 'block';
+
+    // Mark the ePOD button as completed
+    const signatureBtn = document.getElementById('signatureBtn');
+    signatureBtn.classList.remove('disabled');
+    signatureBtn.classList.add('completed');
+    signatureBtn.textContent = 'ePOD - Completed';
+    signatureBtn.disabled = true;
+
+    // Save completed buttons to local storage
+    saveCompletedButtons();
+}
+      
 function closeCameraPopup() {
     // Close the camera popup
     document.getElementById("cameraOverlay").style.display = "none";
