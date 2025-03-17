@@ -463,40 +463,40 @@
             document.getElementById("signatureBtn").disabled = true;
         }
 
-        function openQRScanner(action, expectedCode) {
-            // Open the QR scanner for the specified action
-            currentAction = action;
-            document.getElementById("qrOverlay").style.display = "block";
-            document.getElementById("qrPopup").style.display = "block";
-            document.getElementById("qrMismatch").style.display = "none";
+function openQRScanner(action, expectedCode) {
+    // Open the QR scanner for the specified action
+    currentAction = action;
+    document.getElementById("qrOverlay").style.display = "block";
+    document.getElementById("qrPopup").style.display = "block";
+    document.getElementById("qrMismatch").style.display = "none";
 
-            scanner = new Html5Qrcode("qr-reader");
-            scanner.start(
-                { facingMode: "environment" }, // Use the rear camera
-                { fps: 10, qrbox: 250 }, // Scanner configuration
-                qrCodeMessage => {
-                    // Callback when a QR code is scanned
-                    if (qrCodeMessage === expectedCode) {
-                        let button = document.getElementById(action + "Btn");
-                        button.classList.add("completed"); // Mark the button as completed
-                        button.textContent = button.textContent + " - Completed"; // Update button text
-                        button.disabled = true; // Disable the button
+    scanner = new Html5Qrcode("qr-reader");
+    scanner.start(
+        { facingMode: "environment" }, // Use the rear camera
+        { fps: 10, qrbox: 250 }, // Scanner configuration
+        qrCodeMessage => {
+            // Callback when a QR code is scanned
+            if (qrCodeMessage === expectedCode) {
+                let button = document.getElementById(action + "Btn");
+                button.classList.add("completed"); // Mark the button as completed
+                button.textContent = button.textContent + " - Completed"; // Update button text
+                button.disabled = true; // Disable the button
 
-                        // Save completed buttons to local storage
-                        saveCompletedButtons();
+                // Save completed buttons to local storage
+                saveCompletedButtons();
 
-                        // Check if all buttons are completed
-                        checkAllCompleted();
+                // Check if all buttons are completed
+                checkAllCompleted();
 
-                        closeQRScanner(); // Close the scanner
-                        if (action === "funQuiz") startFunQuiz(); // Start the quiz if applicable
-                    } else {
-                        document.getElementById("qrMismatch").style.display = "block"; // Show mismatch message
-                    }
-                },
-                errorMessage => console.log(errorMessage) // Log errors
-            );
-        }
+                closeQRScanner(); // Close the scanner
+                if (action === "funQuiz") startFunQuiz(); // Start the quiz if applicable
+            } else {
+                document.getElementById("qrMismatch").style.display = "block"; // Show mismatch message
+            }
+        },
+        errorMessage => console.log(errorMessage) // Log errors
+    );
+}
 
         function closeQRScanner() {
             // Close the QR scanner
@@ -509,23 +509,34 @@
         }
 
         // Quiz Functions
-        function startFunQuiz() {
+        //function startFunQuiz() {
             // Start the fun quiz
-            const funQuizButton = document.getElementById("funQuizBtn");
-            funQuizButton.classList.add("completed"); // Add completed class
-            funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
-            funQuizButton.disabled = true; // Disable the button
+        //    const funQuizButton = document.getElementById("funQuizBtn");
+        //    funQuizButton.classList.add("completed"); // Add completed class
+        //    funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
+        //    funQuizButton.disabled = true; // Disable the button
+        //    currentQuizIndex = 0;
+        //    showNextQuiz();
+        //}
+      
+        // Quiz Functions
+function startFunQuiz() {
+    // Start the fun quiz
+    const funQuizButton = document.getElementById("funQuizBtn");
+    funQuizButton.classList.add("completed"); // Add completed class
+    funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
+    funQuizButton.disabled = true; // Disable the button
 
-            // Save completed buttons to local storage
-            saveCompletedButtons();
+    // Save completed buttons to local storage
+    saveCompletedButtons();
 
-            // Check if all buttons are completed
-            checkAllCompleted();
+    // Check if all buttons are completed
+    checkAllCompleted();
 
-            // Start the quiz
-            currentQuizIndex = 0;
-            showNextQuiz();
-        }
+    // Start the quiz
+    currentQuizIndex = 0;
+    showNextQuiz();
+}
 
         function showNextQuiz() {
             // Display the next quiz question
@@ -579,66 +590,144 @@
             document.getElementById("quizPopup").style.display = "none";
         }
 
-        // Completion Check
-        function checkAllCompleted() {
-            // Check if all activities are completed
-            const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn"];
-            const allCompleted = buttons.every(id => {
-                const button = document.getElementById(id);
-                return button.classList.contains("completed"); // Check if each button is completed
-            });
+        // Completion Check in sequence
+        //function checkAllCompleted() {
+        //    // Check if all activities are completed
+        //    const buttons = ["registrationBtn","funQuizBtn","vrBtn","schenkerConnectBtn","smartLogisticsBtn"];
+        //    if (buttons.every(id => document.getElementById(id).classList.contains("completed"))) {
+        //        const signatureBtn = document.getElementById("signatureBtn");
+        //        signatureBtn.classList.remove("disabled"); // Enable signature button
+        //        signatureBtn.disabled = false;
+        //    }
+        //}
 
-            if (allCompleted) {
-                const signatureBtn = document.getElementById("signatureBtn");
-                signatureBtn.classList.remove("disabled"); // Enable signature button
-                signatureBtn.disabled = false;
-            }
-        }
+        // Check if all activities are completed in random
+// Completion Check
+function checkAllCompleted() {
+    // Check if all activities are completed
+    const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn"];
+    const allCompleted = buttons.every(id => {
+        const button = document.getElementById(id);
+        return button.classList.contains("completed"); // Check if each button is completed
+    });
 
-        // Camera Functions
-        const cameraInput = document.getElementById('cameraInput');
-        const cameraPhoto = document.getElementById('cameraPhoto');
-        const saveInstruction = document.getElementById('saveInstruction');
-        const closeCameraButton = document.getElementById('closeCameraButton');
+    if (allCompleted) {
+        const signatureBtn = document.getElementById("signatureBtn");
+        signatureBtn.classList.remove("disabled"); // Enable signature button
+        signatureBtn.disabled = false;
+    }
+}
+        
 
-        // Handle the captured image
-        cameraInput.addEventListener('change', (event) => {
-            const file = event.target.files[0]; // Get the selected file
-            if (file) {
-                const imageUrl = URL.createObjectURL(file); // Create a URL for the image
-                cameraPhoto.src = imageUrl; // Set the image in the pop-up
-                cameraPhoto.style.display = 'block'; // Show the captured photo
-                saveInstruction.style.display = 'block'; // Show save instruction
-                closeCameraButton.style.display = 'block'; // Show close button
-            }
+// Camera Functions
+let cameraStream = null;
+
+function showThankYou() {
+    // Show the camera popup
+    document.getElementById("cameraOverlay").style.display = "block";
+    document.getElementById("cameraPopup").style.display = "block";
+
+    // Start the default camera
+    startCamera();
+
+    // Add event listener to the capture button
+    document.getElementById('captureButton').addEventListener('click', capturePhoto);
+
+    // Add event listener to the close button
+    document.getElementById('closeCameraButton').addEventListener('click', closeCameraPopup);
+}
+
+function startCamera() {
+    // Access the default camera (no specific constraints)
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            cameraStream = stream;
+            const video = document.getElementById('cameraVideo');
+            video.srcObject = stream;
+            video.play(); // Start playing the video stream
+        })
+        .catch(err => {
+            console.error("Error accessing the camera: ", err);
+            alert("Unable to access the camera. Please ensure you have granted permission.");
         });
+}
 
-        // Close the camera popup
-        closeCameraButton.addEventListener('click', () => {
-            document.getElementById("cameraOverlay").style.display = "none";
-            document.getElementById("cameraPopup").style.display = "none";
+function capturePhoto() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('cameraCanvas');
+    const photo = document.getElementById('cameraPhoto');
+    const saveInstruction = document.getElementById('saveInstruction');
+    const closeButton = document.getElementById('closeCameraButton');
 
-            // Mark the ePOD button as completed
-            const signatureBtn = document.getElementById("signatureBtn");
-            signatureBtn.classList.remove("disabled");
-            signatureBtn.classList.add("completed");
-            signatureBtn.textContent = "ePOD - Completed";
-            signatureBtn.disabled = true;
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-            // Show the thank you popup
-            document.getElementById("thankYouOverlay").style.display = "block";
-            document.getElementById("thankYouPopup").style.display = "block";
+    // Draw the current video frame on the canvas
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Save completed buttons to local storage
-            saveCompletedButtons();
-        });
+    // Convert canvas image to data URL and display it
+    const dataUrl = canvas.toDataURL('image/png');
+    photo.src = dataUrl;
+    photo.style.display = 'block';
+    video.style.display = 'none';
+
+    // Show save instruction and close button
+    saveInstruction.style.display = 'block';
+    closeButton.style.display = 'block';
+
+    // Stop the camera stream
+    cameraStream.getTracks().forEach(track => track.stop());
+
+    // Add long-press event to save the photo
+    photo.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        savePhotoToGallery(dataUrl);
+    });
+}
+
+function savePhotoToGallery(dataUrl) {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = 'captured_photo.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    alert('Photo saved to your gallery!');
+}
+
+function closeCameraPopup() {
+    // Close the camera popup
+    document.getElementById("cameraOverlay").style.display = "none";
+    document.getElementById("cameraPopup").style.display = "none";
+
+    // Stop the camera stream if it's still running
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+    }
+
+    // Mark the ePOD button as completed
+    const signatureBtn = document.getElementById("signatureBtn");
+    signatureBtn.classList.remove("disabled");
+    signatureBtn.classList.add("completed");
+    signatureBtn.textContent = "ePOD - Completed";
+    signatureBtn.disabled = true;
+
+    // Show the thank you popup
+    document.getElementById("thankYouOverlay").style.display = "block";
+    document.getElementById("thankYouPopup").style.display = "block";
+
+    // Save completed buttons to local storage
+    saveCompletedButtons();
+}
 
         // Local Storage Logic
-        function saveCompletedButtons() {
+        /* function saveCompletedButtons() {
             // Save completed buttons to local storage
             const completedButtons = [];
             const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn", "signatureBtn"];
-        
+            
             buttons.forEach(id => {
                 const button = document.getElementById(id);
                 if (button.classList.contains("completed")) {
@@ -652,34 +741,54 @@
             };
 
             localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
+        }  */
+      
+      function saveCompletedButtons() {
+          // Save completed buttons to local storage
+        const completedButtons = [];
+        const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn", "signatureBtn"];
+    
+        buttons.forEach(id => {
+        const button = document.getElementById(id);
+        if (button.classList.contains("completed")) {
+            completedButtons.push(id); // Add completed button to the list
         }
+       });
 
-        function restoreCompletedButtons() {
-            // Restore completed buttons from local storage
-            const storageData = JSON.parse(localStorage.getItem("completedButtons"));
-            
-            if (storageData && storageData.completedButtons) {
-                const currentTime = new Date().getTime();
-                const storedTime = storageData.timestamp;
-                const expirationTime = 1 * 60 * 1000; // 30 minutes in milliseconds
+        const storageData = {
+        completedButtons: completedButtons, // List of completed buttons
+        timestamp: new Date().getTime() // Current timestamp
+      };
 
-                if (currentTime - storedTime < expirationTime) {
-                    storageData.completedButtons.forEach(id => {
-                        const button = document.getElementById(id);
-                        if (button) {
-                            button.classList.add("completed"); // Mark button as completed
-                            button.textContent = button.textContent + " - Completed"; // Update button text
-                            button.disabled = true; // Disable the button
-                        }
-                    });
+      localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
+      }
 
-                    // Check if all buttons are completed
-                    checkAllCompleted();
-                } else {
-                    localStorage.removeItem("completedButtons"); // Clear expired data
+function restoreCompletedButtons() {
+    // Restore completed buttons from local storage
+    const storageData = JSON.parse(localStorage.getItem("completedButtons"));
+    
+    if (storageData && storageData.completedButtons) {
+        const currentTime = new Date().getTime();
+        const storedTime = storageData.timestamp;
+        const expirationTime = 1 * 60 * 1000; // 30 minutes in milliseconds
+
+        if (currentTime - storedTime < expirationTime) {
+            storageData.completedButtons.forEach(id => {
+                const button = document.getElementById(id);
+                if (button) {
+                    button.classList.add("completed"); // Mark button as completed
+                    button.textContent = button.textContent + " - Completed"; // Update button text
+                    button.disabled = true; // Disable the button
                 }
-            }
+            });
+
+            // Check if all buttons are completed
+            checkAllCompleted();
+        } else {
+            localStorage.removeItem("completedButtons"); // Clear expired data
         }
+    }
+}
 
         // Restore completed buttons on page load
         window.onload = function() {
