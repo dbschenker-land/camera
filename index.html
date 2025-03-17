@@ -253,37 +253,6 @@
         #closeCameraButton:hover {
             background-color: #666; /* Darker grey on hover */
         }
-
-        /* Photo Popup Styling */
-        #photoPopup {
-            background-color: teal;
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        #photoPopup img {
-            width: 100%;
-            max-width: 300px;
-            margin: 15px auto;
-            border-radius: 8px;
-        }
-
-        #photoPopup button {
-            background-color: white;
-            color: black;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-
-        #photoPopup button:hover {
-            background-color: #555;
-        }
     </style>
 </head>
 <body>
@@ -321,21 +290,14 @@
     <div class="overlay" id="cameraOverlay"></div>
     <div class="popup" id="cameraPopup">
         <h3>Take a Picture</h3>
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
         <div id="cameraPreview">
+            <video id="cameraVideo" autoplay></video>
+            <canvas id="cameraCanvas" style="display: none;"></canvas>
             <img id="cameraPhoto" src="#" alt="Captured Photo" style="display: none;">
         </div>
-        <button id="captureButton" onclick="document.getElementById('cameraInput').click()">Open Camera</button>
+        <button id="captureButton">Capture</button>
         <p id="saveInstruction" style="display: none;">Long press the photo to save it to your gallery.</p>
         <button id="closeCameraButton" style="display: none;">Close</button>
-    </div>
-
-    <!-- Photo Popup -->
-    <div class="overlay" id="photoOverlay"></div>
-    <div class="popup" id="photoPopup">
-        <h3>Your Photo</h3>
-        <img id="displayedPhoto" src="#" alt="Captured Photo" style="width: 100%; border-radius: 8px;">
-        <button onclick="closePhotoPopup()">Continue</button>
     </div>
 
     <!-- Signature Popup -->
@@ -349,14 +311,14 @@
         </div>
     </div>
 
-<!-- Thank You Popup -->
-<div class="overlay" id="thankYouOverlay"></div>
-<div class="popup" id="thankYouPopup">
-    <h2>Electronic Proof of Delivery</h2>
-    <img src="db-schenker-logo.png" alt="DB Schenker Logo" class="logo">
-    <p style="color: #444;">DB Schenker | landbridge</p>
-    <button onclick="exitThankYou()">Finish Experience</button>
-</div>
+    <!-- Thank You Popup -->
+    <div class="overlay" id="thankYouOverlay"></div>
+    <div class="popup" id="thankYouPopup">
+        <h2>Electronic Proof of Delivery</h2>
+        <img src="db-schenker-logo.png" alt="DB Schenker Logo" class="logo">
+        <p style="color: #444;">DB Schenker | landbridge</p>
+        <button onclick="exitThankYou()">Finish Experience</button>
+    </div>
 
     <!-- Exit Popup -->
     <div class="overlay" id="exitOverlay"></div>
@@ -502,40 +464,40 @@
             document.getElementById("signatureBtn").disabled = true;
         }
 
-        function openQRScanner(action, expectedCode) {
-            // Open the QR scanner for the specified action
-            currentAction = action;
-            document.getElementById("qrOverlay").style.display = "block";
-            document.getElementById("qrPopup").style.display = "block";
-            document.getElementById("qrMismatch").style.display = "none";
+function openQRScanner(action, expectedCode) {
+    // Open the QR scanner for the specified action
+    currentAction = action;
+    document.getElementById("qrOverlay").style.display = "block";
+    document.getElementById("qrPopup").style.display = "block";
+    document.getElementById("qrMismatch").style.display = "none";
 
-            scanner = new Html5Qrcode("qr-reader");
-            scanner.start(
-                { facingMode: "environment" }, // Use the rear camera
-                { fps: 10, qrbox: 250 }, // Scanner configuration
-                qrCodeMessage => {
-                    // Callback when a QR code is scanned
-                    if (qrCodeMessage === expectedCode) {
-                        let button = document.getElementById(action + "Btn");
-                        button.classList.add("completed"); // Mark the button as completed
-                        button.textContent = button.textContent + " - Completed"; // Update button text
-                        button.disabled = true; // Disable the button
+    scanner = new Html5Qrcode("qr-reader");
+    scanner.start(
+        { facingMode: "environment" }, // Use the rear camera
+        { fps: 10, qrbox: 250 }, // Scanner configuration
+        qrCodeMessage => {
+            // Callback when a QR code is scanned
+            if (qrCodeMessage === expectedCode) {
+                let button = document.getElementById(action + "Btn");
+                button.classList.add("completed"); // Mark the button as completed
+                button.textContent = button.textContent + " - Completed"; // Update button text
+                button.disabled = true; // Disable the button
 
-                        // Save completed buttons to local storage
-                        saveCompletedButtons();
+                // Save completed buttons to local storage
+                saveCompletedButtons();
 
-                        // Check if all buttons are completed
-                        checkAllCompleted();
+                // Check if all buttons are completed
+                checkAllCompleted();
 
-                        closeQRScanner(); // Close the scanner
-                        if (action === "funQuiz") startFunQuiz(); // Start the quiz if applicable
-                    } else {
-                        document.getElementById("qrMismatch").style.display = "block"; // Show mismatch message
-                    }
-                },
-                errorMessage => console.log(errorMessage) // Log errors
-            );
-        }
+                closeQRScanner(); // Close the scanner
+                if (action === "funQuiz") startFunQuiz(); // Start the quiz if applicable
+            } else {
+                document.getElementById("qrMismatch").style.display = "block"; // Show mismatch message
+            }
+        },
+        errorMessage => console.log(errorMessage) // Log errors
+    );
+}
 
         function closeQRScanner() {
             // Close the QR scanner
@@ -548,23 +510,34 @@
         }
 
         // Quiz Functions
-        function startFunQuiz() {
+        //function startFunQuiz() {
             // Start the fun quiz
-            const funQuizButton = document.getElementById("funQuizBtn");
-            funQuizButton.classList.add("completed"); // Add completed class
-            funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
-            funQuizButton.disabled = true; // Disable the button
+        //    const funQuizButton = document.getElementById("funQuizBtn");
+        //    funQuizButton.classList.add("completed"); // Add completed class
+        //    funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
+        //    funQuizButton.disabled = true; // Disable the button
+        //    currentQuizIndex = 0;
+        //    showNextQuiz();
+        //}
+      
+        // Quiz Functions
+function startFunQuiz() {
+    // Start the fun quiz
+    const funQuizButton = document.getElementById("funQuizBtn");
+    funQuizButton.classList.add("completed"); // Add completed class
+    funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
+    funQuizButton.disabled = true; // Disable the button
 
-            // Save completed buttons to local storage
-            saveCompletedButtons();
+    // Save completed buttons to local storage
+    saveCompletedButtons();
 
-            // Check if all buttons are completed
-            checkAllCompleted();
+    // Check if all buttons are completed
+    checkAllCompleted();
 
-            // Start the quiz
-            currentQuizIndex = 0;
-            showNextQuiz();
-        }
+    // Start the quiz
+    currentQuizIndex = 0;
+    showNextQuiz();
+}
 
         function showNextQuiz() {
             // Display the next quiz question
@@ -618,21 +591,34 @@
             document.getElementById("quizPopup").style.display = "none";
         }
 
-        // Completion Check
-        function checkAllCompleted() {
-            // Check if all activities are completed
-            const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn"];
-            const allCompleted = buttons.every(id => {
-                const button = document.getElementById(id);
-                return button.classList.contains("completed"); // Check if each button is completed
-            });
+        // Completion Check in sequence
+        //function checkAllCompleted() {
+        //    // Check if all activities are completed
+        //    const buttons = ["registrationBtn","funQuizBtn","vrBtn","schenkerConnectBtn","smartLogisticsBtn"];
+        //    if (buttons.every(id => document.getElementById(id).classList.contains("completed"))) {
+        //        const signatureBtn = document.getElementById("signatureBtn");
+        //        signatureBtn.classList.remove("disabled"); // Enable signature button
+        //        signatureBtn.disabled = false;
+        //    }
+        //}
 
-            if (allCompleted) {
-                const signatureBtn = document.getElementById("signatureBtn");
-                signatureBtn.classList.remove("disabled"); // Enable signature button
-                signatureBtn.disabled = false;
-            }
-        }
+        // Check if all activities are completed in random
+// Completion Check
+function checkAllCompleted() {
+    // Check if all activities are completed
+    const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn"];
+    const allCompleted = buttons.every(id => {
+        const button = document.getElementById(id);
+        return button.classList.contains("completed"); // Check if each button is completed
+    });
+
+    if (allCompleted) {
+        const signatureBtn = document.getElementById("signatureBtn");
+        signatureBtn.classList.remove("disabled"); // Enable signature button
+        signatureBtn.disabled = false;
+    }
+}
+        
 
         // Camera Functions
         let cameraStream = null;
@@ -642,7 +628,7 @@
             document.getElementById("cameraOverlay").style.display = "block";
             document.getElementById("cameraPopup").style.display = "block";
 
-            // Start the default camera
+            // Start the camera
             startCamera();
 
             // Add event listener to the capture button
@@ -653,13 +639,11 @@
         }
 
         function startCamera() {
-            // Access the default camera (no specific constraints)
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     cameraStream = stream;
                     const video = document.getElementById('cameraVideo');
                     video.srcObject = stream;
-                    video.play(); // Start playing the video stream
                 })
                 .catch(err => {
                     console.error("Error accessing the camera: ", err);
@@ -669,8 +653,10 @@
 
         function capturePhoto() {
             const video = document.getElementById('cameraVideo');
-            const canvas = document.createElement('canvas');
+            const canvas = document.getElementById('cameraCanvas');
             const photo = document.getElementById('cameraPhoto');
+            const saveInstruction = document.getElementById('saveInstruction');
+            const closeButton = document.getElementById('closeCameraButton');
 
             // Set canvas dimensions to match video
             canvas.width = video.videoWidth;
@@ -680,55 +666,63 @@
             const context = canvas.getContext('2d');
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Convert canvas image to data URL
+            // Convert canvas image to data URL and display it
             const dataUrl = canvas.toDataURL('image/png');
+            photo.src = dataUrl;
+            photo.style.display = 'block';
+            video.style.display = 'none';
+
+            // Show save instruction and close button
+            saveInstruction.style.display = 'block';
+            closeButton.style.display = 'block';
 
             // Stop the camera stream
+            cameraStream.getTracks().forEach(track => track.stop());
+
+            // Add long-press event to save the photo
+            photo.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                savePhotoToGallery(dataUrl);
+            });
+        }
+
+        function savePhotoToGallery(dataUrl) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'captured_photo.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert('Photo saved to your gallery!');
+        }
+
+        function closeCameraPopup() {
+            // Close the camera popup
+            document.getElementById("cameraOverlay").style.display = "none";
+            document.getElementById("cameraPopup").style.display = "none";
+
+            // Stop the camera stream if it's still running
             if (cameraStream) {
                 cameraStream.getTracks().forEach(track => track.stop());
             }
 
-            // Hide the camera preview and show the captured photo
-            video.style.display = 'none';
-            photo.src = dataUrl;
-            photo.style.display = 'block';
+            // Mark the ePOD button as completed
+            const signatureBtn = document.getElementById("signatureBtn");
+            signatureBtn.classList.remove("disabled");
+            signatureBtn.classList.add("completed");
+            signatureBtn.textContent = "ePOD - Completed";
+            signatureBtn.disabled = true;
 
-            // Show the photo in the photo popup
-            showPhotoPopup(dataUrl);
+            // Show the thank you popup
+            document.getElementById("thankYouOverlay").style.display = "block";
+            document.getElementById("thankYouPopup").style.display = "block";
+
+            // Save completed buttons to local storage
+            saveCompletedButtons();
         }
-
-        function showPhotoPopup(dataUrl) {
-            // Set the captured photo in the displayedPhoto element
-            const displayedPhoto = document.getElementById('displayedPhoto');
-            displayedPhoto.src = dataUrl;
-
-            // Show the photo popup and overlay
-            document.getElementById('photoOverlay').style.display = 'block';
-            document.getElementById('photoPopup').style.display = 'block';
-        }
-
-function closePhotoPopup() {
-    // Hide the photo popup and overlay
-    document.getElementById('photoOverlay').style.display = 'none';
-    document.getElementById('photoPopup').style.display = 'none';
-
-    // Direct to the thank you popup
-    document.getElementById('thankYouOverlay').style.display = 'block';
-    document.getElementById('thankYouPopup').style.display = 'block';
-
-    // Mark the ePOD button as completed
-    const signatureBtn = document.getElementById('signatureBtn');
-    signatureBtn.classList.remove('disabled');
-    signatureBtn.classList.add('completed');
-    signatureBtn.textContent = 'ePOD - Completed';
-    signatureBtn.disabled = true;
-
-    // Save completed buttons to local storage
-    saveCompletedButtons();
-}
 
         // Local Storage Logic
-        function saveCompletedButtons() {
+        /* function saveCompletedButtons() {
             // Save completed buttons to local storage
             const completedButtons = [];
             const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn", "signatureBtn"];
@@ -746,34 +740,54 @@ function closePhotoPopup() {
             };
 
             localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
+        }  */
+      
+      function saveCompletedButtons() {
+          // Save completed buttons to local storage
+        const completedButtons = [];
+        const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn", "signatureBtn"];
+    
+        buttons.forEach(id => {
+        const button = document.getElementById(id);
+        if (button.classList.contains("completed")) {
+            completedButtons.push(id); // Add completed button to the list
         }
+       });
 
-        function restoreCompletedButtons() {
-            // Restore completed buttons from local storage
-            const storageData = JSON.parse(localStorage.getItem("completedButtons"));
-            
-            if (storageData && storageData.completedButtons) {
-                const currentTime = new Date().getTime();
-                const storedTime = storageData.timestamp;
-                const expirationTime = 1 * 60 * 1000; // 30 minutes in milliseconds
+        const storageData = {
+        completedButtons: completedButtons, // List of completed buttons
+        timestamp: new Date().getTime() // Current timestamp
+      };
 
-                if (currentTime - storedTime < expirationTime) {
-                    storageData.completedButtons.forEach(id => {
-                        const button = document.getElementById(id);
-                        if (button) {
-                            button.classList.add("completed"); // Mark button as completed
-                            button.textContent = button.textContent + " - Completed"; // Update button text
-                            button.disabled = true; // Disable the button
-                        }
-                    });
+      localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
+      }
 
-                    // Check if all buttons are completed
-                    checkAllCompleted();
-                } else {
-                    localStorage.removeItem("completedButtons"); // Clear expired data
+function restoreCompletedButtons() {
+    // Restore completed buttons from local storage
+    const storageData = JSON.parse(localStorage.getItem("completedButtons"));
+    
+    if (storageData && storageData.completedButtons) {
+        const currentTime = new Date().getTime();
+        const storedTime = storageData.timestamp;
+        const expirationTime = 1 * 60 * 1000; // 30 minutes in milliseconds
+
+        if (currentTime - storedTime < expirationTime) {
+            storageData.completedButtons.forEach(id => {
+                const button = document.getElementById(id);
+                if (button) {
+                    button.classList.add("completed"); // Mark button as completed
+                    button.textContent = button.textContent + " - Completed"; // Update button text
+                    button.disabled = true; // Disable the button
                 }
-            }
+            });
+
+            // Check if all buttons are completed
+            checkAllCompleted();
+        } else {
+            localStorage.removeItem("completedButtons"); // Clear expired data
         }
+    }
+}
 
         // Restore completed buttons on page load
         window.onload = function() {
