@@ -508,14 +508,30 @@
         }
 
         // Quiz Functions
-        function startFunQuiz() {
+        //function startFunQuiz() {
             // Start the fun quiz
-            const funQuizButton = document.getElementById("funQuizBtn");
-            funQuizButton.classList.add("completed"); // Add completed class
-            funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
-            funQuizButton.disabled = true; // Disable the button
-            currentQuizIndex = 0;
-            showNextQuiz();
+        //    const funQuizButton = document.getElementById("funQuizBtn");
+        //    funQuizButton.classList.add("completed"); // Add completed class
+        //    funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
+        //    funQuizButton.disabled = true; // Disable the button
+        //    currentQuizIndex = 0;
+        //    showNextQuiz();
+        //}
+      
+        // Quiz Functions
+        function startFunQuiz() {
+        // Start the fun quiz
+        const funQuizButton = document.getElementById("funQuizBtn");
+        funQuizButton.classList.add("completed"); // Add completed class
+        funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
+        funQuizButton.disabled = true; // Disable the button
+
+        // Save the completed state to local storage
+        saveCompletedButtons();
+
+        // Start the quiz
+        currentQuizIndex = 0;
+        showNextQuiz();
         }
 
         function showNextQuiz() {
@@ -699,7 +715,7 @@
         }
 
         // Local Storage Logic
-        function saveCompletedButtons() {
+        /* function saveCompletedButtons() {
             // Save completed buttons to local storage
             const completedButtons = [];
             const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn", "signatureBtn"];
@@ -717,7 +733,27 @@
             };
 
             localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
+        }  */
+      
+      function saveCompletedButtons() {
+          // Save completed buttons to local storage
+        const completedButtons = [];
+        const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn", "signatureBtn"];
+    
+        buttons.forEach(id => {
+        const button = document.getElementById(id);
+        if (button.classList.contains("completed")) {
+            completedButtons.push(id); // Add completed button to the list
         }
+       });
+
+        const storageData = {
+        completedButtons: completedButtons, // List of completed buttons
+        timestamp: new Date().getTime() // Current timestamp
+      };
+
+      localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
+      }
 
         function restoreCompletedButtons() {
             // Restore completed buttons from local storage
@@ -751,4 +787,4 @@
         };
     </script>
 </body>
-</html>
+</html
