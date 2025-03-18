@@ -737,7 +737,10 @@ function restoreCompletedButtons() {
                 const button = document.getElementById(id);
                 if (button) {
                     button.classList.add("completed"); // Mark button as completed
-                  //  button.textContent = button.textContent + " - Completed"; // Update button text
+                    button.textContent = button.textContent + " - Completed"; // Update button text
+                    if (id === "registrationBtn") {
+                        button.textContent = "Pick up - Completed"; // Ensure text remains "Pick up - Completed"
+                    }
                     button.disabled = true; // Disable the button
                 }
             });
