@@ -272,8 +272,8 @@
     <button id="registrationBtn" onclick="openQRScanner('registration', '123456')" class="completed" disabled>Pick up - Completed</button>
     <button id="funQuizBtn" onclick="startFunQuiz()">Customs Clearance</button>
     <button id="vrBtn" onclick="openQRScanner('vr', '123456')">Cross Border</button>
-    <button id="schenkerConnectBtn" onclick="openQRScanner('schenkerConnect', '123456')">Transit</button>
-    <button id="smartLogisticsBtn" onclick="openQRScanner('smartLogistics', '123456')">Delivered</button>
+    <button id="schenkerConnectBtn" onclick="openQRScanner('schenkerConnect', '234567')">Transit</button>
+    <button id="smartLogisticsBtn" onclick="openQRScanner('smartLogistics', '345678')">Delivered</button>
     <!-- QR Scanner Popup -->
       <div class="overlay" id="qrOverlay"></div>
       <div class="popup" id="qrPopup">
@@ -364,8 +364,8 @@
             registration: "123456", // QR code for registration
             funQuiz: "123456", // QR code for fun quiz
             vr: "123456", // QR code for VR
-            schenkerConnect: "123456", // QR code for Schenker Connect
-            smartLogistics: "123456" // QR code for smart logistics
+            schenkerConnect: "234567", // QR code for Schenker Connect
+            smartLogistics: "345678" // QR code for smart logistics
         };
 
         // Quiz Configuration
@@ -510,17 +510,6 @@ function openQRScanner(action, expectedCode) {
         }
 
         // Quiz Functions
-        //function startFunQuiz() {
-            // Start the fun quiz
-        //    const funQuizButton = document.getElementById("funQuizBtn");
-        //    funQuizButton.classList.add("completed"); // Add completed class
-        //    funQuizButton.textContent = "Customs Clearance - Completed"; // Update button text
-        //    funQuizButton.disabled = true; // Disable the button
-        //    currentQuizIndex = 0;
-        //    showNextQuiz();
-        //}
-      
-        // Quiz Functions
 function startFunQuiz() {
     // Start the fun quiz
     const funQuizButton = document.getElementById("funQuizBtn");
@@ -591,19 +580,7 @@ function startFunQuiz() {
             document.getElementById("quizPopup").style.display = "none";
         }
 
-        // Completion Check in sequence
-        //function checkAllCompleted() {
-        //    // Check if all activities are completed
-        //    const buttons = ["registrationBtn","funQuizBtn","vrBtn","schenkerConnectBtn","smartLogisticsBtn"];
-        //    if (buttons.every(id => document.getElementById(id).classList.contains("completed"))) {
-        //        const signatureBtn = document.getElementById("signatureBtn");
-        //        signatureBtn.classList.remove("disabled"); // Enable signature button
-        //        signatureBtn.disabled = false;
-        //    }
-        //}
-
-        // Check if all activities are completed in random
-// Completion Check
+        // Completion Check
 function checkAllCompleted() {
     // Check if all activities are completed
     const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn"];
@@ -639,7 +616,7 @@ function checkAllCompleted() {
         }
 
         function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                 .then(stream => {
                     cameraStream = stream;
                     const video = document.getElementById('cameraVideo');
@@ -657,6 +634,7 @@ function checkAllCompleted() {
             const photo = document.getElementById('cameraPhoto');
             const saveInstruction = document.getElementById('saveInstruction');
             const closeButton = document.getElementById('closeCameraButton');
+            const captureButton = document.getElementById('captureButton'); // Get the capture button
 
             // Set canvas dimensions to match video
             canvas.width = video.videoWidth;
@@ -678,6 +656,9 @@ function checkAllCompleted() {
 
             // Stop the camera stream
             cameraStream.getTracks().forEach(track => track.stop());
+
+            // Disable the capture button
+            captureButton.disabled = true; // Disable the capture button after capturing the photo
 
             // Add long-press event to save the photo
             photo.addEventListener('contextmenu', (e) => {
@@ -722,26 +703,6 @@ function checkAllCompleted() {
         }
 
         // Local Storage Logic
-        /* function saveCompletedButtons() {
-            // Save completed buttons to local storage
-            const completedButtons = [];
-            const buttons = ["registrationBtn", "funQuizBtn", "vrBtn", "schenkerConnectBtn", "smartLogisticsBtn", "signatureBtn"];
-            
-            buttons.forEach(id => {
-                const button = document.getElementById(id);
-                if (button.classList.contains("completed")) {
-                    completedButtons.push(id); // Add completed button to the list
-                }
-            });
-
-            const storageData = {
-                completedButtons: completedButtons, // List of completed buttons
-                timestamp: new Date().getTime() // Current timestamp
-            };
-
-            localStorage.setItem("completedButtons", JSON.stringify(storageData)); // Save to local storage
-        }  */
-      
       function saveCompletedButtons() {
           // Save completed buttons to local storage
         const completedButtons = [];
@@ -776,7 +737,7 @@ function restoreCompletedButtons() {
                 const button = document.getElementById(id);
                 if (button) {
                     button.classList.add("completed"); // Mark button as completed
-                    button.textContent = button.textContent + " - Completed"; // Update button text
+                  //  button.textContent = button.textContent + " - Completed"; // Update button text
                     button.disabled = true; // Disable the button
                 }
             });
