@@ -8,6 +8,8 @@
     <title>Singapore Landbridge Event</title>
     <!-- External script for QR code scanning functionality -->
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- Include FileSaver.js for saving photos on mobile -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <!-- Internal CSS for styling the webpage -->
     <style>
         /* General body styling */
@@ -616,15 +618,29 @@ function checkAllCompleted() {
         }
 
         function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            const constraints = {
+                video: {
+                    facingMode: "environment", // Use the rear camera
+                    width: { ideal: 1280 }, // Adjust resolution for mobile
+                    height: { ideal: 720 }
+                }
+            };
+
+            navigator.mediaDevices.getUserMedia(constraints)
                 .then(stream => {
                     cameraStream = stream;
                     const video = document.getElementById('cameraVideo');
                     video.srcObject = stream;
+
+                    // Handle orientation change for mobile devices
+                    window.addEventListener("orientationchange", () => {
+                        video.style.transform = `rotate(${window.orientation}deg)`;
+                    });
                 })
                 .catch(err => {
                     console.error("Error accessing the camera: ", err);
                     alert("Unable to access the camera. Please ensure you have granted permission.");
+                    closeCameraPopup(); // Close the popup if camera access is denied
                 });
         }
 
@@ -634,7 +650,7 @@ function checkAllCompleted() {
             const photo = document.getElementById('cameraPhoto');
             const saveInstruction = document.getElementById('saveInstruction');
             const closeButton = document.getElementById('closeCameraButton');
-            const captureButton = document.getElementById('captureButton'); // Get the capture button
+            const captureButton = document.getElementById('captureButton');
 
             // Set canvas dimensions to match video
             canvas.width = video.videoWidth;
@@ -658,7 +674,7 @@ function checkAllCompleted() {
             cameraStream.getTracks().forEach(track => track.stop());
 
             // Disable the capture button
-            captureButton.disabled = true; // Disable the capture button after capturing the photo
+            captureButton.disabled = true;
 
             // Add long-press event to save the photo
             photo.addEventListener('contextmenu', (e) => {
@@ -668,13 +684,21 @@ function checkAllCompleted() {
         }
 
         function savePhotoToGallery(dataUrl) {
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = 'captured_photo.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const blob = dataURLtoBlob(dataUrl); // Convert data URL to Blob
+            saveAs(blob, 'captured_photo.png'); // Save the photo using FileSaver.js
             alert('Photo saved to your gallery!');
+        }
+
+        function dataURLtoBlob(dataUrl) {
+            const arr = dataUrl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
         }
 
         function closeCameraPopup() {
