@@ -741,6 +741,10 @@ function restoreCompletedButtons() {
                     if (id === "registrationBtn") {
                         button.textContent = "Pick up - Completed"; // Ensure text remains "Pick up - Completed"
                     }
+                    if (id === "signatureBtn") {
+                        button.textContent = "Pick up - Completed"; // Ensure text remains "Pick up - Completed"
+                        signatureBtn.disabled = true; // Disable ePOD button if not all buttons are completed
+                    }
                     button.disabled = true; // Disable the button
                 }
             });
@@ -751,6 +755,7 @@ function restoreCompletedButtons() {
             localStorage.removeItem("completedButtons"); // Clear expired data
         }
     }
+
 }
 
         // Restore completed buttons on page load
